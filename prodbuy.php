@@ -50,12 +50,20 @@ while ($arrayp=mysqli_fetch_array($exeSQL))
         // Add a section of code to display the number of items left in stock.
         echo "<p><h3>Number in stock: ".$arrayp['prodQuantity']."</h3>";
 
-        echo "<p>Number to be purchased: ";
+        echo "<p><h3>Number to be purchased: </h3>";
+  
     
         //create form made of one text field and one button for user to enter quantity
         //the value entered in the form will be posted to the basket.php to be processed
         echo "<form action=basket.php method=post>";
-        echo "<input type=text name=p_quantity size=5 maxlength=3>";
+        
+        echo "<select name='p_quantity'>";
+        for ($i = 1; $i <= $arrayp['prodQuantity']; $i++) {
+            echo "<option value='$i'>$i</option>";
+        }
+        echo "</select>";
+
+
         echo "<input type=submit name='submitbtn' value='ADD TO BASKET' id='submitbtn'>";
         //pass the product id to the next page basket.php as a hidden value
         echo "<input type=hidden name=h_prodid value=".$prodid.">";

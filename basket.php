@@ -1,7 +1,5 @@
 <?php
-
 session_start();
-
 include ("db.php"); //include db.php file to connect to DB
 
 $pagename="Smart Basket"; //create and populate variable called $pagename
@@ -14,49 +12,56 @@ include ("headfile.html");
 
 echo "<h4>".$pagename."</h4>";
 
-//capture the ID of selected product using the POST method and the $_POST superglobal variable
-//and store it in a new local variable called $newprodid
-//capture the required quantity of selected product using the POST method and $_POST superglobal variable
-//and store it in a new local variable called $reququantity
-//Display id of selected product
-//Display quantity of selected product
-$newprodid = $_POST['h_prodid'];
-$reququantity = $_POST['p_quantity'];
-
-// echo "<p>Selected product Id: ".$newprodid;            // no need after adding if condition
-// echo "<p>Quantity of product: ".$reququantity;
-
-//create a new cell in the basket session array. Index this cell with the new product id.
-//Inside the cell store the required product quantity
-$_SESSION['basket'][$newprodid]=$reququantity;
-// echo "<p>1 item added";
-
-
 if (isset($_POST['h_prodid'])) {
-    //capture the ID of selected product using the POST method and the $_POST superglobal variable
-    //and store it in a new local variable called $newprodid
-    //capture the required quantity of selected product using the POST method and $_POST superglobal variable
-    //and store it in a new local variable called $reququantity
     $newprodid = $_POST['h_prodid'];
     $reququantity = $_POST['p_quantity'];
-
-    //Display id of selected product
     echo "<p>Selected product Id: ".$newprodid;
-    //Display quantity of selected product
-    echo "<p>Quantity of product: ".$reququantity;
-
-    //create a new cell in the basket session array. Index this cell with the new product id.
-    //Inside the cell store the required product quantity
     $_SESSION['basket'][$newprodid] = $reququantity;
-
-    //Display "1 item added to the basket " message
-    echo "<p>1 item added to the basket";
+    echo "<p>1 item added";
 } else {
-    //Display "Basket unchanged " message
     echo "<p>Basket unchanged";
 }
 
+$total = 0;
+echo "<table border='1'>";
+echo "<tr>";
+echo "<th>Product Name</th>";
+echo "<th>Price</th>";
+echo "<th>Quantity</th>";
+echo "<th>Subtotal</th>";
+echo "</tr>";
 
-include ("footfile.html");
-echo "</body>";
+if (isset($_SESSION['basket'])) {
+    $productFound = false;
+    foreach ($_SESSION['basket'] as $index => $value) {
+        $stmt = $conn->prepare("SELECT prodName, prodPrice FROM Product WHERE prodId = ?");
+        $stmt->bind_param("i", $index);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $arrayp = $result->fetch_assoc();
+
+        if ($arrayp) {
+            $productFound = true;
+            echo "<tr>";
+            echo "<td>".$arrayp['prodName']."</td>";
+            echo "<td>".$arrayp['prodPrice']."</td>";
+            echo "<td>".$value."</td>";
+            $subtotal = $arrayp['prodPrice'] * $value;
+            echo "<td>".$subtotal."</td>";
+            $total += $subtotal;
+            echo "</tr>";
+        }
+    }
+    if (!$productFound) {
+        echo "<tr><td colspan='4'>Product not found</td></tr>";
+    }
+    echo "<tr>";
+    echo "<td colspan='3'>Total</td>";
+    echo "<td>".$total."</td>";
+    echo "</tr>";
+} else {
+    echo "<p>Basket is empty</p>";
+}
+
+echo "</table>";
 ?>

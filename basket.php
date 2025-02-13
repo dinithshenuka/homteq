@@ -64,4 +64,14 @@ if (isset($_SESSION['basket'])) {
 }
 
 echo "</table>";
+
+// clear the basket
+echo "<p><a href='clearbasket.php'>Clear Basket</a></p>";
+
+// signup and login links
+echo "<p><a href='signup.php'>Sign Up</a></p>";
+echo "<p><a href='login.php'>Log In</a></p>";
+
+include("footfile.html");
+echo "</body>";
 ?>
